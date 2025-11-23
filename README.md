@@ -38,43 +38,6 @@ O projeto é simples o suficiente para estudo, mas completo o bastante para ente
 
 ---
 
-## 🏗 Estrutura da Arquitetura
-src/
-├── domain/
-│ ├── uProduto.pas
-│ ├── uItemVenda.pas
-│ ├── uVenda.pas
-│ ├── uPagamento.pas
-│ ├── uRepositorioProduto.pas
-│ └── uRepositorioVenda.pas
-│
-├── infrastructure/
-│ ├── repositorios/
-│ │ ├── uRepositorioProdutoMemoria.pas
-│ │ └── uRepositorioVendaMemoria.pas
-│ ├── pagamentos/
-│ │ ├── uPagamentoDinheiro.pas
-│ │ ├── uPagamentoPix.pas
-│ │ └── uPagamentoCartao.pas
-│
-├── application/
-│ ├── usecases/
-│ │ ├── uCadastrarProdutoUseCase.pas
-│ │ ├── uListarProdutosUseCase.pas
-│ │ ├── uCriarVendaUseCase.pas
-│ │ ├── uAdicionarItemUseCase.pas
-│ │ └── uProcessarPagamentoUseCase.pas
-│ └── facade/
-│ └── uAppServices.pas
-│
-└── ui/
-├── dmApp.pas
-├── FormProdutos.pas
-├── FormProdutoCadastro.pas
-└── FormVenda.pas
-
----
-
 ## ⚙️ Funcionalidades
 
 ### ✔ Cadastro de Produtos
