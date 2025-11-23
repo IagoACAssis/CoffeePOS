@@ -1,0 +1,27 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 523
+  ClientWidth = 473
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object btnProdutos: TButton
+    Position.X = 40.000000000000000000
+    Position.Y = 192.000000000000000000
+    TabOrder = 0
+    Text = 'Produtos'
+    TextSettings.Trimming = None
+    OnClick = btnProdutosClick
+  end
+  object btnNovaVenda: TButton
+    Position.X = 40.000000000000000000
+    Position.Y = 240.000000000000000000
+    TabOrder = 1
+    Text = 'Nova Venda'
+    TextSettings.Trimming = None
+    OnClick = btnNovaVendaClick
+  end
+end
