@@ -9,6 +9,7 @@ type
   TVenda = class
   private
     FId: string;
+    FClienteId: string;
     FData: TDateTime;
     FItens: TObjectList<TItemVenda>;
   public
@@ -20,6 +21,7 @@ type
     function Total: Currency;
 
     property Id: string read FId;
+    property ClienteId: string read FClienteId write FClienteId;
     property Data: TDateTime read FData;
     property Itens: TObjectList<TItemVenda> read FItens;
   end;

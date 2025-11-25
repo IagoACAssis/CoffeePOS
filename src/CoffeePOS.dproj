@@ -316,6 +316,22 @@
             <Form>FormVenda</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="domain\entidades\uCliente.pas"/>
+        <DCCReference Include="domain\interfaces\uRepositorioCliente.pas"/>
+        <DCCReference Include="infrastructure\uRepositorioClienteMemoria.pas"/>
+        <DCCReference Include="application\usecases\uCadastrarClienteUseCase.pas"/>
+        <DCCReference Include="application\usecases\uListarClientesUseCase.pas"/>
+        <DCCReference Include="application\usecases\uDefinirClienteDaVendaUseCase.pas"/>
+        <DCCReference Include="application\usecases\uAlterarItemDaVendaUseCase.pas"/>
+        <DCCReference Include="application\usecases\uRemoverItemDaVendaUseCase.pas"/>
+        <DCCReference Include="ui\uFormClientes.pas">
+            <Form>FormClientes</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="ui\uFormClienteCadastro.pas">
+            <Form>FormClienteCadastro</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -7,23 +7,37 @@ uses
   System.Generics.Collections,
   uProduto,
   uVenda,
+  uCliente,
   uRepositorioProduto,
   uRepositorioVenda,
+  uRepositorioCliente,
   uRepositorioProdutoMemoria,
   uRepositorioVendaMemoria,
+  uRepositorioClienteMemoria,
   uCadastrarProdutoUseCase,
   uListarProdutosUseCase,
   uCriarVendaUseCase,
   uAdicionarItemUseCase,
-  uProcessarPagamentoUseCase;
+  uProcessarPagamentoUseCase,
+  uCadastrarClienteUseCase,
+  uListarClientesUseCase,
+  uDefinirClienteDaVendaUseCase,
+  uAlterarItemDaVendaUseCase,
+  uRemoverItemDaVendaUseCase;
 
 type
   TAppServices = class
   private
     FRepoProduto: IRepositorioProduto;
+    FRepoCliente: IRepositorioCliente;
     FRepoVenda: IRepositorioVenda;
   public
     constructor Create;
+
+    // CLIENTES
+    function CadastrarCliente(const Nome, Telefone: string): TCliente;
+    function ListarClientes: TObjectList<TCliente>;
+    function DefinirClienteDaVenda(const VendaId, ClienteId: string): TVenda;
 
     // PRODUTOS
     function CadastrarProduto(const Nome: string; Preco: Currency): TProduto;
@@ -31,10 +45,15 @@ type
 
     // VENDAS
     function CriarVenda: TVenda;
-    function AdicionarItem(const VendaId, ProdutoId: string; Quantidade: Integer): TVenda;
+    function AdicionarItem(const VendaId, ProdutoId: string;
+      Quantidade: Integer): TVenda;
+    function AlterarItemDaVenda(const VendaId, ProdutoId: string;
+      NovaQtd: Integer): TVenda;
+    function RemoverItemDaVenda(const VendaId, ProdutoId: string): TVenda;
 
     // PAGAMENTO
-    function ProcessarPagamento(const VendaId: string; Tipo: TTipoPagamento): TProcessarPagamentoResponse;
+    function ProcessarPagamento(const VendaId: string; Tipo: TTipoPagamento)
+      : TProcessarPagamentoResponse;
   end;
 
 implementation
@@ -45,10 +64,60 @@ constructor TAppServices.Create;
 begin
   // Repositórios concretos (por enquanto, em memória)
   FRepoProduto := TRepositorioProdutoMemoria.Create;
+  FRepoCliente := TRepositorioClienteMemoria.Create;
   FRepoVenda := TRepositorioVendaMemoria.Create;
 end;
 
-function TAppServices.CadastrarProduto(const Nome: string; Preco: Currency): TProduto;
+// ClIENTES
+function TAppServices.CadastrarCliente(const Nome, Telefone: string): TCliente;
+var
+  UC: ICadastrarClienteUseCase;
+  Req: TCadastrarClienteRequest;
+  Res: TCadastrarClienteResponse;
+begin
+  UC := TCadastrarClienteUseCase.Create(FRepoCliente);
+
+  Req.Nome := Nome;
+  Req.Telefone := Telefone;
+
+  Res := UC.Executar(Req);
+
+  Result := Res.Cliente;
+
+end;
+
+function TAppServices.ListarClientes: TObjectList<TCliente>;
+var
+  UC: IListarClientesUseCase;
+  Res: TListarClientesResponse;
+begin
+  UC := TListarClientesUseCase.Create(FRepoCliente);
+  Res := UC.Executar;
+  Result := Res.Clientes;
+
+end;
+
+function TAppServices.DefinirClienteDaVenda(const VendaId,
+  ClienteId: string): TVenda;
+var
+  UC: IDefinirClienteDaVendaUseCase;
+  Req: TDefinirClienteDaVendaRequest;
+  Res: TDefinirClienteDaVendaResponse;
+begin
+  UC := TDefinirClienteDaVendaUseCase.Create(FRepoVenda, FRepoCliente);
+
+  Req.VendaId := VendaId;
+  Req.ClienteId := ClienteId;
+
+  Res := UC.Executar(Req);
+
+  Result := Res.Venda;
+
+end;
+
+// PRODUTOS
+function TAppServices.CadastrarProduto(const Nome: string; Preco: Currency)
+  : TProduto;
 var
   UC: ICadastrarProdutoUseCase;
   Req: TCadastrarProdutoRequest;
@@ -73,6 +142,7 @@ begin
   Result := Res.Produtos;
 end;
 
+// VENDA
 function TAppServices.CriarVenda: TVenda;
 var
   UC: ICriarVendaUseCase;
@@ -83,7 +153,8 @@ begin
   Result := Res.Venda;
 end;
 
-function TAppServices.AdicionarItem(const VendaId, ProdutoId: string; Quantidade: Integer): TVenda;
+function TAppServices.AdicionarItem(const VendaId, ProdutoId: string;
+  Quantidade: Integer): TVenda;
 var
   UC: IAdicionarItemUseCase;
   Req: TAdicionarItemRequest;
@@ -100,6 +171,44 @@ begin
   Result := Res.Venda;
 end;
 
+
+function TAppServices.AlterarItemDaVenda(const VendaId, ProdutoId: string;
+  NovaQtd: Integer): TVenda;
+var
+  UC: IAlterarItemDaVendaUseCase;
+  Req: TAlterarItemDaVendaRequest;
+  Res: TAlterarItemDaVendaResponse;
+begin
+  UC := TAlterarItemDaVendaUseCase.Create(FRepoVenda, FRepoProduto);
+
+  Req.VendaId := VendaId;
+  Req.ProdutoId := ProdutoId;
+  Req.NovaQuantidade := NovaQtd;
+
+  Res := UC.Executar(Req);
+
+  Result := Res.Venda;
+
+end;
+
+function TAppServices.RemoverItemDaVenda(const VendaId,
+  ProdutoId: string): TVenda;
+var
+  UC: IRemoverItemDaVendaUseCase;
+  Req: TRemoverItemDaVendaRequest;
+  Res: TRemoverItemDaVendaResponse;
+begin
+  UC := TRemoverItemDaVendaUseCase.Create(FRepoVenda);
+
+  Req.VendaId := VendaId;
+  Req.ProdutoId := ProdutoId;
+
+  Res := UC.Executar(Req);
+
+  Result := Res.Venda;
+end;
+
+// PAGAMENTO
 function TAppServices.ProcessarPagamento(const VendaId: string;
   Tipo: TTipoPagamento): TProcessarPagamentoResponse;
 var
@@ -114,5 +223,5 @@ begin
   Result := UC.Executar(Req);
 end;
 
-end.
 
+end.

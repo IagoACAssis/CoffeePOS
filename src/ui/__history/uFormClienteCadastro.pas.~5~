@@ -1,0 +1,72 @@
+unit uFormClienteCadastro;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Edit, FMX.Layouts, FMX.Controls.Presentation;
+
+type
+  TForm1 = class(TForm)
+    ToolBar1: TToolBar;
+    lblTitulo: TLabel;
+    Layout1: TLayout;
+    lblNome: TLabel;
+    edtNome: TEdit;
+    Layout2: TLayout;
+    lblTelefone: TLabel;
+    edtTelefone: TEdit;
+    btnSalvar: TButton;
+    procedure btnSalvarClick(Sender: TObject);
+  private
+    function Validar: Boolean;
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.fmx}
+
+uses uDMApp;
+
+{ TForm1 }
+
+procedure TForm1.btnSalvarClick(Sender: TObject);
+begin
+  if not Validar then Exit;
+
+  DMApp.App.CadastrarCliente(
+    edtNome.Text,
+    edtTelefone.Text
+  );
+
+  ShowMessage('Cliente cadastrado com sucesso!');
+  Close;
+end;
+
+function TForm1.Validar: Boolean;
+begin
+  Result := False;
+
+  if edtNome.Text.Trim = '' then
+  begin
+    ShowMessage('Informe o nome.');
+    Exit;
+  end;
+
+  if edtTelefone.Text.Trim = '' then
+  begin
+    ShowMessage('Informe o nome.');
+    Exit;
+  end;
+
+
+  Result := True;
+end;
+
+end.

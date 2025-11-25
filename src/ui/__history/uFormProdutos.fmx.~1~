@@ -1,0 +1,49 @@
+object FormProdutos: TFormProdutos
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 610
+  ClientWidth = 403
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object ToolBar1: TToolBar
+    Size.Width = 403.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object lblTitulo: TLabel
+      Align = Left
+      Size.Width = 120.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Produtos'
+      TabOrder = 0
+    end
+    object btnNovo: TButton
+      Align = Right
+      Position.X = 323.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'additembutton'
+      TabOrder = 1
+      Text = 'btnNovo'
+      TextSettings.Trimming = None
+      OnClick = btnNovoClick
+    end
+  end
+  object lvProdutos: TListView
+    ItemAppearanceClassName = 'TListItemAppearance'
+    ItemEditAppearanceClassName = 'TListItemShowCheckAppearance'
+    HeaderAppearanceClassName = 'TListHeaderObjects'
+    FooterAppearanceClassName = 'TListHeaderObjects'
+    Align = Client
+    Size.Width = 403.000000000000000000
+    Size.Height = 570.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+  end
+end

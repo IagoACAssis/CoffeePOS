@@ -24,7 +24,17 @@ uses
   MainForm in 'ui\MainForm.pas' {FormMain},
   uFormProdutoCadastro in 'ui\uFormProdutoCadastro.pas' {FormProdutoCadastro},
   uFormProdutos in 'ui\uFormProdutos.pas' {FormProdutos},
-  uFormVenda in 'ui\uFormVenda.pas' {FormVenda};
+  uFormVenda in 'ui\uFormVenda.pas' {FormVenda},
+  uCliente in 'domain\entidades\uCliente.pas',
+  uRepositorioCliente in 'domain\interfaces\uRepositorioCliente.pas',
+  uRepositorioClienteMemoria in 'infrastructure\uRepositorioClienteMemoria.pas',
+  uCadastrarClienteUseCase in 'application\usecases\uCadastrarClienteUseCase.pas',
+  uListarClientesUseCase in 'application\usecases\uListarClientesUseCase.pas',
+  uDefinirClienteDaVendaUseCase in 'application\usecases\uDefinirClienteDaVendaUseCase.pas',
+  uAlterarItemDaVendaUseCase in 'application\usecases\uAlterarItemDaVendaUseCase.pas',
+  uRemoverItemDaVendaUseCase in 'application\usecases\uRemoverItemDaVendaUseCase.pas',
+  uFormClientes in 'ui\uFormClientes.pas' {FormClientes},
+  uFormClienteCadastro in 'ui\uFormClienteCadastro.pas' {FormClienteCadastro};
 
 {$R *.res}
 
@@ -35,5 +45,7 @@ begin
   Application.CreateForm(TFormProdutoCadastro, FormProdutoCadastro);
   Application.CreateForm(TFormProdutos, FormProdutos);
   Application.CreateForm(TFormVenda, FormVenda);
+  Application.CreateForm(TFormClientes, FormClientes);
+  Application.CreateForm(TFormClienteCadastro, FormClienteCadastro);
   Application.Run;
 end.

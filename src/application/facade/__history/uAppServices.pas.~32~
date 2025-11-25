@@ -1,0 +1,186 @@
+unit uAppServices;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Generics.Collections,
+  uProduto,
+  uVenda,
+  uCliente,
+  uRepositorioProduto,
+  uRepositorioVenda,
+  uRepositorioCliente,
+  uRepositorioProdutoMemoria,
+  uRepositorioVendaMemoria,
+  uRepositorioClienteMemoria,
+  uCadastrarProdutoUseCase,
+  uListarProdutosUseCase,
+  uCriarVendaUseCase,
+  uAdicionarItemUseCase,
+  uProcessarPagamentoUseCase,
+  uCadastrarClienteUseCase,
+  uListarClientesUseCase, uDefinirClienteDaVendaUseCase;
+
+type
+  TAppServices = class
+  private
+    FRepoProduto: IRepositorioProduto;
+    FRepoCliente: IRepositorioCliente;
+    FRepoVenda: IRepositorioVenda;
+  public
+    constructor Create;
+
+    // CLIENTES
+    function CadastrarCliente(const Nome, Telefone: string): TCliente;
+    function ListarClientes: TObjectList<TCliente>;
+    function DefinirClienteDaVenda(const VendaId, ClienteId: string): TVenda;
+
+    // PRODUTOS
+    function CadastrarProduto(const Nome: string; Preco: Currency): TProduto;
+    function ListarProdutos: TObjectList<TProduto>;
+
+    // VENDAS
+    function CriarVenda: TVenda;
+    function AdicionarItem(const VendaId, ProdutoId: string;
+      Quantidade: Integer): TVenda;
+    function AlterarItemDaVenda(const VendaId, ProdutoId: string;
+      NovaQtd: Integer): TVenda;
+    function RemoverItemDaVenda(const VendaId, ProdutoId: string): TVenda;
+
+    // PAGAMENTO
+    function ProcessarPagamento(const VendaId: string; Tipo: TTipoPagamento)
+      : TProcessarPagamentoResponse;
+  end;
+
+implementation
+
+{ TAppServices }
+
+constructor TAppServices.Create;
+begin
+  // Repositórios concretos (por enquanto, em memória)
+  FRepoProduto := TRepositorioProdutoMemoria.Create;
+  FRepoCliente := TRepositorioClienteMemoria.Create;
+  FRepoVenda := TRepositorioVendaMemoria.Create;
+end;
+
+// ClIENTES
+function TAppServices.CadastrarCliente(const Nome, Telefone: string): TCliente;
+var
+  UC: ICadastrarClienteUseCase;
+  Req: TCadastrarClienteRequest;
+  Res: TCadastrarClienteResponse;
+begin
+  UC := TCadastrarClienteUseCase.Create(FRepoCliente);
+
+  Req.Nome := Nome;
+  Req.Telefone := Telefone;
+
+  Res := UC.Executar(Req);
+
+  Result := Res.Cliente;
+
+end;
+
+function TAppServices.ListarClientes: TObjectList<TCliente>;
+var
+  UC: IListarClientesUseCase;
+  Res: TListarClientesResponse;
+begin
+  UC := TListarClientesUseCase.Create(FRepoCliente);
+  Res := UC.Executar;
+  Result := Res.Clientes;
+
+end;
+
+function TAppServices.DefinirClienteDaVenda(const VendaId,
+  ClienteId: string): TVenda;
+var
+  UC: IDefinirClienteDaVendaUseCase;
+  Req: TDefinirClienteDaVendaRequest;
+  Res: TDefinirClienteDaVendaResponse;
+begin
+  UC := TDefinirClienteDaVendaUseCase.Create(FRepoVenda, FRepoCliente);
+
+  Req.VendaId := VendaId;
+  Req.ClienteId := ClienteId;
+
+  Res := UC.Executar(Req);
+
+  Result := Res.Venda;
+
+end;
+
+// PRODUTOS
+function TAppServices.CadastrarProduto(const Nome: string; Preco: Currency)
+  : TProduto;
+var
+  UC: ICadastrarProdutoUseCase;
+  Req: TCadastrarProdutoRequest;
+  Res: TCadastrarProdutoResponse;
+begin
+  UC := TCadastrarProdutoUseCase.Create(FRepoProduto);
+
+  Req.Nome := Nome;
+  Req.Preco := Preco;
+
+  Res := UC.Executar(Req);
+  Result := Res.Produto;
+end;
+
+function TAppServices.ListarProdutos: TObjectList<TProduto>;
+var
+  UC: IListarProdutosUseCase;
+  Res: TListarProdutosResponse;
+begin
+  UC := TListarProdutosUseCase.Create(FRepoProduto);
+  Res := UC.Executar;
+  Result := Res.Produtos;
+end;
+
+// VENDA
+function TAppServices.CriarVenda: TVenda;
+var
+  UC: ICriarVendaUseCase;
+  Res: TCriarVendaResponse;
+begin
+  UC := TCriarVendaUseCase.Create(FRepoVenda);
+  Res := UC.Executar;
+  Result := Res.Venda;
+end;
+
+function TAppServices.AdicionarItem(const VendaId, ProdutoId: string;
+  Quantidade: Integer): TVenda;
+var
+  UC: IAdicionarItemUseCase;
+  Req: TAdicionarItemRequest;
+  Res: TAdicionarItemResponse;
+begin
+  UC := TAdicionarItemUseCase.Create(FRepoVenda, FRepoProduto);
+
+  Req.VendaId := VendaId;
+  Req.ProdutoId := ProdutoId;
+  Req.Quantidade := Quantidade;
+
+  Res := UC.Executar(Req);
+
+  Result := Res.Venda;
+end;
+
+// PAGAMENTO
+function TAppServices.ProcessarPagamento(const VendaId: string;
+  Tipo: TTipoPagamento): TProcessarPagamentoResponse;
+var
+  UC: IProcessarPagamentoUseCase;
+  Req: TProcessarPagamentoRequest;
+begin
+  UC := TProcessarPagamentoUseCase.Create(FRepoVenda);
+
+  Req.VendaId := VendaId;
+  Req.TipoPagamento := Tipo;
+
+  Result := UC.Executar(Req);
+end;
+
+end.

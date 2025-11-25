@@ -1,0 +1,43 @@
+unit uListarClientesUseCase;
+
+interface
+
+uses
+  System.Generics.Collections,
+  uCliente,
+  uRepositorioCliente;
+
+type
+  TListarClientesResponse = record
+    Clientes: TObjectList<TCliente>;
+  end;
+
+  IListarClientesUseCase = interface
+    ['{E0F617B5-8F81-4E4C-9FCB-2276D34A179B}']
+    function Executar: TListarClientesResponse;
+  end;
+
+type
+  TListarClientesUseCase = class(TInterfacedObject, IListarClientesUseCase)
+  private
+    FRepositorioCliente: IRepositorioCliente;
+  public
+    constructor Create(ARepo: IRepositorioCliente);
+    function Executar: TListarClientesResponse;
+  end;
+
+implementation
+
+{ TListarClientesUseCase }
+
+constructor TListarClientesUseCase.Create(ARepo: IRepositorioCliente);
+begin
+  FRepositorioCliente := ARepo;
+end;
+
+function TListarClientesUseCase.Executar: TListarClientesResponse;
+begin
+  Result.Clientes := FRepositorioCliente.Listar;
+end;
+
+end.

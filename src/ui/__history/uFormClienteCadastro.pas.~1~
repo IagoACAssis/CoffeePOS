@@ -1,0 +1,34 @@
+unit uFormClienteCadastro;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Edit, FMX.Layouts, FMX.Controls.Presentation;
+
+type
+  TForm1 = class(TForm)
+    ToolBar1: TToolBar;
+    lblTitulo: TLabel;
+    Layout1: TLayout;
+    lblNome: TLabel;
+    edtNome: TEdit;
+    Layout2: TLayout;
+    lblTelefone: TLabel;
+    edtTelefone: TEdit;
+    btnSalvar: TButton;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.fmx}
+
+end.

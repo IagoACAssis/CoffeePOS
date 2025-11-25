@@ -3,14 +3,15 @@ object FormProdutoCadastro: TFormProdutoCadastro
   Top = 0
   ActiveControl = edtPreco
   Caption = 'Form1'
-  ClientHeight = 537
-  ClientWidth = 389
+  ClientHeight = 650
+  ClientWidth = 350
+  Position = DesktopCenter
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
   object ToolBar1: TToolBar
-    Size.Width = 389.000000000000000000
+    Size.Width = 350.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
@@ -26,7 +27,7 @@ object FormProdutoCadastro: TFormProdutoCadastro
   object Layout1: TLayout
     Align = Top
     Position.Y = 40.000000000000000000
-    Size.Width = 389.000000000000000000
+    Size.Width = 350.000000000000000000
     Size.Height = 41.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
@@ -45,7 +46,7 @@ object FormProdutoCadastro: TFormProdutoCadastro
       Align = Client
       TabOrder = 1
       Margins.Right = 5.000000000000000000
-      Size.Width = 259.000000000000000000
+      Size.Width = 220.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
     end
@@ -53,7 +54,7 @@ object FormProdutoCadastro: TFormProdutoCadastro
   object Layout2: TLayout
     Align = Top
     Position.Y = 81.000000000000000000
-    Size.Width = 389.000000000000000000
+    Size.Width = 350.000000000000000000
     Size.Height = 41.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
@@ -72,7 +73,7 @@ object FormProdutoCadastro: TFormProdutoCadastro
       Align = Client
       TabOrder = 1
       Margins.Right = 5.000000000000000000
-      Size.Width = 259.000000000000000000
+      Size.Width = 220.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
     end
@@ -84,7 +85,7 @@ object FormProdutoCadastro: TFormProdutoCadastro
     Margins.Right = 5.000000000000000000
     Position.X = 5.000000000000000000
     Position.Y = 132.000000000000000000
-    Size.Width = 379.000000000000000000
+    Size.Width = 340.000000000000000000
     Size.Height = 55.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4

@@ -1,0 +1,174 @@
+unit uFormVenda;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Controls.Presentation, FMX.ListView.Types, FMX.ListView.Appearances,
+  FMX.ListView.Adapters.Base, FMX.Edit, FMX.EditBox, FMX.SpinBox, FMX.ListView,
+  FMX.ListBox, FMX.Layouts, uVenda, uDMApp, uProcessarPagamentoUseCase,
+  System.Generics.Collections;
+
+type
+  TFormVenda = class(TForm)
+    ToolBar1: TToolBar;
+    lblTitulo: TLabel;
+    btnVoltar: TButton;
+    cmbProdutos: TComboBox;
+    lvItens: TListView;
+    spQuantidade: TSpinBox;
+    btnAdicionarItem: TButton;
+    btnPagarDinheiro: TButton;
+    btnPagarCartao: TButton;
+    btnPagarPix: TButton;
+    layFooter: TLayout;
+    lblTotal: TLabel;
+    Layout1: TLayout;
+    lblClienteSelecionado: TLabel;
+    btnSelecionarCliente: TButton;
+    procedure FormShow(Sender: TObject);
+    procedure btnPagarDinheiroClick(Sender: TObject);
+    procedure btnPagarCartaoClick(Sender: TObject);
+    procedure btnPagarPixClick(Sender: TObject);
+    procedure btnAdicionarItemClick(Sender: TObject);
+    procedure btnSelecionarClienteClick(Sender: TObject);
+  private
+    FVenda: TVenda;
+    procedure CriarNovaVenda;
+    procedure CarregarProdutos;
+    procedure AtualizarCarrinho;
+    procedure ProcessarPagamento(Tipo: TTipoPagamento);
+
+  public
+    SelectedClienteId: string;
+  end;
+
+var
+  FormVenda: TFormVenda;
+
+implementation
+
+uses
+  uItemVenda, uProduto, uFormClientes;
+
+{$R *.fmx}
+
+procedure TFormVenda.FormShow(Sender: TObject);
+begin
+  CriarNovaVenda;
+  CarregarProdutos;
+  AtualizarCarrinho;
+end;
+
+procedure TFormVenda.AtualizarCarrinho;
+var
+  Item: TItemVenda;
+  P: TProduto;
+  ListItem: TListViewItem;
+begin
+  lvItens.Items.Clear;
+
+  for Item in FVenda.Itens do
+  begin
+    P := Item.Produto;
+
+    ListItem := lvItens.Items.Add;
+    ListItem.Text := P.Nome;
+    ListItem.Detail :=
+      Format('%d x R$ %.2f = R$ %.2f',
+      [Item.Quantidade, P.Preco, Item.ValorTotal]);
+  end;
+
+  lblTotal.Text := Format('Total: R$ %.2f', [FVenda.Total]);
+
+end;
+
+procedure TFormVenda.btnAdicionarItemClick(Sender: TObject);
+var
+  Produto: TProduto;
+begin
+  if cmbProdutos.ItemIndex < 0 then
+  begin
+    ShowMessage('Selecione um produto.');
+    Exit;
+  end;
+
+  Produto := TProduto(cmbProdutos.Items.Objects[cmbProdutos.ItemIndex]);
+
+  FVenda := DMApp.App.AdicionarItem(
+    FVenda.Id,
+    Produto.Id,
+    Round(spQuantidade.Value)
+  );
+
+  AtualizarCarrinho;
+
+end;
+
+procedure TFormVenda.btnPagarCartaoClick(Sender: TObject);
+begin
+  ProcessarPagamento(tpCartao);
+end;
+
+procedure TFormVenda.btnPagarDinheiroClick(Sender: TObject);
+begin
+  ProcessarPagamento(tpDinheiro);
+end;
+
+procedure TFormVenda.btnPagarPixClick(Sender: TObject);
+begin
+  ProcessarPagamento(tpPix);
+end;
+
+procedure TFormVenda.btnSelecionarClienteClick(Sender: TObject);
+var
+  ClienteId: string;
+begin
+  with TFormClientes.Create(Self) do
+  begin
+    // Abrimos como modal para o usuário escolher
+    if ShowModal = mrOk then
+    begin
+      ClienteId := SelectedClienteId; // Vamos criar isso a seguir
+      FVenda := DMApp.App.DefinirClienteDaVenda(FVenda.Id, ClienteId);
+      lblClienteSelecionado.Text := 'Cliente: ' + ClienteId;
+    end;
+
+    Free;
+  end;
+
+end;
+
+procedure TFormVenda.CarregarProdutos;
+var
+  Lista: TObjectList<TProduto>;
+  P: TProduto;
+begin
+  cmbProdutos.Clear;
+  Lista := DMApp.App.ListarProdutos;
+
+  for P in Lista do
+    cmbProdutos.Items.AddObject(P.Nome, TObject(P));
+
+end;
+
+procedure TFormVenda.ProcessarPagamento(Tipo: TTipoPagamento);
+var
+  Resp: TProcessarPagamentoResponse;
+begin
+  Resp := DMApp.App.ProcessarPagamento(FVenda.Id, Tipo);
+
+  if Resp.Sucesso then
+    ShowMessage('Pagamento concluído! ' + Resp.Mensagem)
+  else
+    ShowMessage('Falha: ' + Resp.Mensagem);
+
+end;
+
+procedure TFormVenda.CriarNovaVenda;
+begin
+  FVenda := DMApp.App.CriarVenda;
+end;
+
+end.

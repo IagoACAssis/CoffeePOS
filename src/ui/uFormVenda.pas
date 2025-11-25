@@ -24,11 +24,16 @@ type
     btnPagarPix: TButton;
     layFooter: TLayout;
     lblTotal: TLabel;
+    Layout1: TLayout;
+    lblClienteSelecionado: TLabel;
+    btnSelecionarCliente: TButton;
     procedure FormShow(Sender: TObject);
     procedure btnPagarDinheiroClick(Sender: TObject);
     procedure btnPagarCartaoClick(Sender: TObject);
     procedure btnPagarPixClick(Sender: TObject);
     procedure btnAdicionarItemClick(Sender: TObject);
+    procedure btnSelecionarClienteClick(Sender: TObject);
+    procedure btnVoltarClick(Sender: TObject);
   private
     FVenda: TVenda;
     procedure CriarNovaVenda;
@@ -37,7 +42,7 @@ type
     procedure ProcessarPagamento(Tipo: TTipoPagamento);
 
   public
-    { Public declarations }
+    SelectedClienteId: string;
   end;
 
 var
@@ -46,7 +51,7 @@ var
 implementation
 
 uses
-  uItemVenda, uProduto;
+  uItemVenda, uProduto, uFormClientes;
 
 {$R *.fmx}
 
@@ -115,6 +120,30 @@ end;
 procedure TFormVenda.btnPagarPixClick(Sender: TObject);
 begin
   ProcessarPagamento(tpPix);
+end;
+
+procedure TFormVenda.btnSelecionarClienteClick(Sender: TObject);
+var
+  ClienteId: string;
+begin
+  with TFormClientes.Create(Self) do
+  begin
+    // Abrimos como modal para o usuário escolher
+    if ShowModal = mrOk then
+    begin
+      ClienteId := SelectedClienteId; // vamos criar isso a seguir
+      FVenda := DMApp.App.DefinirClienteDaVenda(FVenda.Id, ClienteId);
+      lblClienteSelecionado.Text := 'Cliente: ' + ClienteId;
+    end;
+
+    Free;
+  end;
+
+end;
+
+procedure TFormVenda.btnVoltarClick(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TFormVenda.CarregarProdutos;

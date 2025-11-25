@@ -1,0 +1,81 @@
+unit uFormClientes;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Controls.Presentation, FMX.ListView.Types, FMX.ListView.Appearances,
+  FMX.ListView.Adapters.Base, FMX.ListView, uCliente;
+
+type
+  TFormClientes = class(TForm)
+    ToolBar1: TToolBar;
+    lblTitulo: TLabel;
+    btnNovo: TButton;
+    lvClientes: TListView;
+    procedure btnNovoClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure lvClientesItemClick(const Sender: TObject;
+      const AItem: TListViewItem);
+  private
+    procedure CarregarClientes;
+  public
+    SelectedClienteId: string;
+  end;
+
+var
+  FormClientes: TFormClientes;
+
+implementation
+
+{$R *.fmx}
+
+uses uDMApp, System.Generics.Collections, uFormClienteCadastro;
+
+{ TFormClientes }
+
+procedure TFormClientes.btnNovoClick(Sender: TObject);
+begin
+  with TFormClienteCadastro.Create(Self) do
+  begin
+    ShowModal;
+    Free;
+  end;
+
+  CarregarClientes;
+end;
+
+procedure TFormClientes.CarregarClientes;
+var
+  Lista: TObjectList<TCliente>;
+  C: TCliente;
+  Item: TListViewItem;
+begin
+  lvClientes.Items.Clear;
+
+  Lista := DMApp.App.ListarClientes;
+
+  for C in Lista do
+  begin
+    Item := lvClientes.Items.Add;
+    Item.Text := C.Nome;
+    Item.Detail := C.Telefone;
+    Item.TagString := C.Id;
+  end;
+
+end;
+
+procedure TFormClientes.FormShow(Sender: TObject);
+begin
+  CarregarClientes;
+end;
+
+procedure TFormClientes.lvClientesItemClick(const Sender: TObject;
+  const AItem: TListViewItem);
+begin
+  SelectedClienteId := AItem.TagString;
+  ModalResult := mrOk;
+end;
+
+end.

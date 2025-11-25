@@ -2,15 +2,16 @@ object FormProdutos: TFormProdutos
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 610
-  ClientWidth = 403
+  ClientHeight = 650
+  ClientWidth = 350
+  Position = DesktopCenter
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnShow = FormShow
   DesignerMasterStyle = 0
   object ToolBar1: TToolBar
-    Size.Width = 403.000000000000000000
+    Size.Width = 350.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
@@ -24,7 +25,7 @@ object FormProdutos: TFormProdutos
     end
     object btnNovo: TButton
       Align = Right
-      Position.X = 323.000000000000000000
+      Position.X = 270.000000000000000000
       Size.Width = 80.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
@@ -41,8 +42,8 @@ object FormProdutos: TFormProdutos
     HeaderAppearanceClassName = 'TListHeaderObjects'
     FooterAppearanceClassName = 'TListHeaderObjects'
     Align = Client
-    Size.Width = 403.000000000000000000
-    Size.Height = 570.000000000000000000
+    Size.Width = 350.000000000000000000
+    Size.Height = 610.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
   end
