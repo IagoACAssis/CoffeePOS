@@ -33,6 +33,7 @@ type
     procedure btnPagarPixClick(Sender: TObject);
     procedure btnAdicionarItemClick(Sender: TObject);
     procedure btnSelecionarClienteClick(Sender: TObject);
+    procedure btnVoltarClick(Sender: TObject);
   private
     FVenda: TVenda;
     procedure CriarNovaVenda;
@@ -138,6 +139,11 @@ begin
     Free;
   end;
 
+end;
+
+procedure TFormVenda.btnVoltarClick(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TFormVenda.CarregarProdutos;

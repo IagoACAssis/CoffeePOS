@@ -2,21 +2,22 @@ object FormVenda: TFormVenda
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 548
-  ClientWidth = 345
+  ClientHeight = 650
+  ClientWidth = 350
+  Position = DesktopCenter
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnShow = FormShow
   DesignerMasterStyle = 0
   object ToolBar1: TToolBar
-    Size.Width = 345.000000000000000000
+    Size.Width = 350.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     object lblTitulo: TLabel
       Align = Client
-      Size.Width = 265.000000000000000000
+      Size.Width = 270.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
       TextSettings.HorzAlign = Center
@@ -32,6 +33,7 @@ object FormVenda: TFormVenda
       TabOrder = 1
       Text = 'Voltar'
       TextSettings.Trimming = None
+      OnClick = btnVoltarClick
     end
   end
   object cmbProdutos: TComboBox
@@ -42,7 +44,7 @@ object FormVenda: TFormVenda
     Margins.Bottom = 5.000000000000000000
     Position.X = 5.000000000000000000
     Position.Y = 118.000000000000000000
-    Size.Width = 335.000000000000000000
+    Size.Width = 340.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
@@ -57,11 +59,10 @@ object FormVenda: TFormVenda
     Margins.Top = 5.000000000000000000
     Margins.Right = 5.000000000000000000
     Margins.Bottom = 5.000000000000000000
-    Size.Width = 335.000000000000000000
-    Size.Height = 259.000000000000000000
+    Size.Width = 340.000000000000000000
+    Size.Height = 361.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
-    OnItemClick = lvItensItemClick
   end
   object spQuantidade: TSpinBox
     Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -73,7 +74,7 @@ object FormVenda: TFormVenda
     Margins.Left = 5.000000000000000000
     Margins.Right = 5.000000000000000000
     Margins.Bottom = 5.000000000000000000
-    Size.Width = 335.000000000000000000
+    Size.Width = 340.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
   end
@@ -83,7 +84,7 @@ object FormVenda: TFormVenda
     Margins.Right = 6.000000000000000000
     Position.X = 5.000000000000000000
     Position.Y = 172.000000000000000000
-    Size.Width = 334.000000000000000000
+    Size.Width = 339.000000000000000000
     Size.Height = 30.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
@@ -93,8 +94,8 @@ object FormVenda: TFormVenda
   end
   object layFooter: TLayout
     Align = Bottom
-    Position.Y = 498.000000000000000000
-    Size.Width = 345.000000000000000000
+    Position.Y = 600.000000000000000000
+    Size.Width = 350.000000000000000000
     Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
@@ -154,8 +155,8 @@ object FormVenda: TFormVenda
     Margins.Right = 5.000000000000000000
     Margins.Bottom = 5.000000000000000000
     Position.X = 5.000000000000000000
-    Position.Y = 476.000000000000000000
-    Size.Width = 335.000000000000000000
+    Position.Y = 578.000000000000000000
+    Size.Width = 340.000000000000000000
     Size.Height = 17.000000000000000000
     Size.PlatformDefault = False
     Text = 'Total'
@@ -164,17 +165,17 @@ object FormVenda: TFormVenda
   object Layout1: TLayout
     Align = Top
     Position.Y = 40.000000000000000000
-    Size.Width = 345.000000000000000000
+    Size.Width = 350.000000000000000000
     Size.Height = 73.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 8
     object lblClienteSelecionado: TLabel
       Align = Top
-      Size.Width = 345.000000000000000000
+      Size.Width = 350.000000000000000000
       Size.Height = 33.000000000000000000
       Size.PlatformDefault = False
       TextSettings.HorzAlign = Center
-      Text = 'Iago de Assis'
+      Text = 'Cliente n'#227'o selecionado'
       TabOrder = 0
     end
     object btnSelecionarCliente: TButton
@@ -183,7 +184,7 @@ object FormVenda: TFormVenda
       Margins.Top = 5.000000000000000000
       Margins.Right = 5.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Size.Width = 335.000000000000000000
+      Size.Width = 340.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1

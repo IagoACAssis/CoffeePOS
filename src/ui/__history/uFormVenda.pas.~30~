@@ -33,8 +33,7 @@ type
     procedure btnPagarPixClick(Sender: TObject);
     procedure btnAdicionarItemClick(Sender: TObject);
     procedure btnSelecionarClienteClick(Sender: TObject);
-    procedure lvItensItemClick(const Sender: TObject;
-      const AItem: TListViewItem);
+    procedure btnVoltarClick(Sender: TObject);
   private
     FVenda: TVenda;
     procedure CriarNovaVenda;
@@ -61,13 +60,6 @@ begin
   CriarNovaVenda;
   CarregarProdutos;
   AtualizarCarrinho;
-end;
-
-procedure TFormVenda.lvItensItemClick(const Sender: TObject;
-  const AItem: TListViewItem);
-begin
-  SelectedClienteId := AItem.TagString;
-  ModalResult := mrOk;
 end;
 
 procedure TFormVenda.AtualizarCarrinho;
@@ -139,7 +131,7 @@ begin
     // Abrimos como modal para o usuário escolher
     if ShowModal = mrOk then
     begin
-      ClienteId := SelectedClienteId; // vamos criar isso a seguir
+      ClienteId := SelectedClienteId; // Vamos criar isso a seguir
       FVenda := DMApp.App.DefinirClienteDaVenda(FVenda.Id, ClienteId);
       lblClienteSelecionado.Text := 'Cliente: ' + ClienteId;
     end;
@@ -147,6 +139,11 @@ begin
     Free;
   end;
 
+end;
+
+procedure TFormVenda.btnVoltarClick(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TFormVenda.CarregarProdutos;

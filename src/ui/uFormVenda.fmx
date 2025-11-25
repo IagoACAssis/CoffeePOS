@@ -63,6 +63,7 @@ object FormVenda: TFormVenda
     Size.Height = 361.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
+    OnItemClick = lvItensItemClick
   end
   object spQuantidade: TSpinBox
     Touch.InteractiveGestures = [LongTap, DoubleTap]

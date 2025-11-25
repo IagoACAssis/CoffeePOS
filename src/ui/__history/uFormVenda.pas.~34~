@@ -33,6 +33,7 @@ type
     procedure btnPagarPixClick(Sender: TObject);
     procedure btnAdicionarItemClick(Sender: TObject);
     procedure btnSelecionarClienteClick(Sender: TObject);
+    procedure btnVoltarClick(Sender: TObject);
     procedure lvItensItemClick(const Sender: TObject;
       const AItem: TListViewItem);
   private
@@ -65,9 +66,30 @@ end;
 
 procedure TFormVenda.lvItensItemClick(const Sender: TObject;
   const AItem: TListViewItem);
+var
+  ProdutoId: string;
+  NovaQuantidade: string;
+  Qtd: Integer;
 begin
-  SelectedClienteId := AItem.TagString;
-  ModalResult := mrOk;
+  // Recupera o ProdutoId salvo no Item
+  ProdutoId := AItem.TagString;
+
+  // Pede a nova quantidade
+  if not InputQuery('Alterar quantidade',
+    ['Nova quantidade:'], NovaQuantidade) then
+    Exit;
+
+  if not TryStrToInt(NovaQuantidade, Qtd) or (Qtd <= 0) then
+  begin
+    ShowMessage('Quantidade inválida.');
+    Exit;
+  end;
+
+  // Chama a facade para atualizar
+  FVenda := DMApp.App.AlterarItemDaVenda(FVenda.Id, ProdutoId, Qtd);
+
+  // Atualiza o carrinho visualmente
+  AtualizarCarrinho;
 end;
 
 procedure TFormVenda.AtualizarCarrinho;
@@ -87,6 +109,8 @@ begin
     ListItem.Detail :=
       Format('%d x R$ %.2f = R$ %.2f',
       [Item.Quantidade, P.Preco, Item.ValorTotal]);
+
+    ListItem.TagString := P.Id; // <-- IMPORTANTE
   end;
 
   lblTotal.Text := Format('Total: R$ %.2f', [FVenda.Total]);
@@ -147,6 +171,11 @@ begin
     Free;
   end;
 
+end;
+
+procedure TFormVenda.btnVoltarClick(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TFormVenda.CarregarProdutos;
