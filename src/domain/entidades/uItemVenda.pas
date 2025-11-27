@@ -8,6 +8,7 @@ uses
 type
   TItemVenda = class
   private
+    FId: string;
     FProduto: TProduto;
     FQuantidade: Integer;
   public
@@ -15,6 +16,7 @@ type
 
     function ValorTotal: Currency;
 
+    property Id: string read FId;
     property Produto: TProduto read FProduto;
     property Quantidade: Integer read FQuantidade write FQuantidade;
   end;
@@ -23,6 +25,7 @@ implementation
 
 constructor TItemVenda.Create(AProduto: TProduto; AQuantidade: Integer);
 begin
+  FId := TGUID.NewGuid.ToString;
   FProduto := AProduto;
   FQuantidade := AQuantidade;
 end;

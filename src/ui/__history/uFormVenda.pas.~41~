@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.Edit, FMX.EditBox, FMX.SpinBox, FMX.ListView,
   FMX.ListBox, FMX.Layouts, uVenda, uDMApp, uProcessarPagamentoUseCase,
@@ -34,12 +34,16 @@ type
     procedure btnAdicionarItemClick(Sender: TObject);
     procedure btnSelecionarClienteClick(Sender: TObject);
     procedure btnVoltarClick(Sender: TObject);
+    procedure lvItensItemClick(const Sender: TObject;
+      const AItem: TListViewItem);
   private
     FVenda: TVenda;
     procedure CriarNovaVenda;
     procedure CarregarProdutos;
     procedure AtualizarCarrinho;
     procedure ProcessarPagamento(Tipo: TTipoPagamento);
+    procedure RemoverItemDaVenda(const ProdutoId: string);
+    procedure AlterarQuantidadeDoItem(const ProdutoId: string);
 
   public
     SelectedClienteId: string;
@@ -51,7 +55,7 @@ var
 implementation
 
 uses
-  uItemVenda, uProduto, uFormClientes;
+  uItemVenda, uProduto, uFormClientes, FMX.Dialogs;
 
 {$R *.fmx}
 
@@ -59,6 +63,68 @@ procedure TFormVenda.FormShow(Sender: TObject);
 begin
   CriarNovaVenda;
   CarregarProdutos;
+  AtualizarCarrinho;
+end;
+
+procedure TFormVenda.lvItensItemClick(const Sender: TObject;
+  const AItem: TListViewItem);
+var
+  Opcao: Integer;
+  ProdutoId: string;
+begin
+  ProdutoId := AItem.TagString;
+
+  Opcao := MessageDlg(
+    'O que deseja fazer com "' + AItem.Text + '"?',
+    TMsgDlgType.mtInformation,
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel],
+    0,
+    TMsgDlgBtn.mbCancel
+  );
+
+  {
+    Yes     = Alterar quantidade
+    No      = Remover item
+    Cancel  = Nada
+  }
+
+  case Opcao of
+    mrYes:
+      AlterarQuantidadeDoItem(ProdutoId); // vamos criar esse método
+    mrNo:
+      RemoverItemDaVenda(ProdutoId);      // vamos criar esse método
+  end;
+end;
+
+
+procedure TFormVenda.RemoverItemDaVenda(const ProdutoId: string);
+begin
+  if MessageDlg('Remover este item?', TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrNo then
+    Exit;
+
+  FVenda := DMApp.App.RemoverItemDaVenda(FVenda.Id, ProdutoId);
+
+//  AtualizarCarrinho;
+
+  ShowMessage('Item removido.');
+end;
+
+procedure TFormVenda.AlterarQuantidadeDoItem(const ProdutoId: string);
+var
+  NovaQtdStr: string;
+  NovaQtd: Integer;
+begin
+  if not InputQuery('Alterar quantidade', ['Nova quantidade:'], NovaQtdStr) then
+    Exit;
+
+  if not TryStrToInt(NovaQtdStr, NovaQtd) or (NovaQtd <= 0) then
+  begin
+    ShowMessage('Quantidade inválida.');
+    Exit;
+  end;
+
+  FVenda := DMApp.App.AlterarItemDaVenda(FVenda.Id, ProdutoId, NovaQtd);
+
   AtualizarCarrinho;
 end;
 
@@ -79,6 +145,8 @@ begin
     ListItem.Detail :=
       Format('%d x R$ %.2f = R$ %.2f',
       [Item.Quantidade, P.Preco, Item.ValorTotal]);
+
+    ListItem.TagString := P.Id; // <-- IMPORTANTE
   end;
 
   lblTotal.Text := Format('Total: R$ %.2f', [FVenda.Total]);
@@ -131,7 +199,7 @@ begin
     // Abrimos como modal para o usuário escolher
     if ShowModal = mrOk then
     begin
-      ClienteId := SelectedClienteId; // vamos criar isso a seguir
+      ClienteId := SelectedClienteId; // Vamos criar isso a seguir
       FVenda := DMApp.App.DefinirClienteDaVenda(FVenda.Id, ClienteId);
       lblClienteSelecionado.Text := 'Cliente: ' + ClienteId;
     end;
@@ -143,7 +211,7 @@ end;
 
 procedure TFormVenda.btnVoltarClick(Sender: TObject);
 begin
-Close;
+  Close;
 end;
 
 procedure TFormVenda.CarregarProdutos;

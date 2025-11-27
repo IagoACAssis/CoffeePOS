@@ -47,9 +47,9 @@ type
     function CriarVenda: TVenda;
     function AdicionarItem(const VendaId, ProdutoId: string;
       Quantidade: Integer): TVenda;
-    function AlterarItemDaVenda(const VendaId, ProdutoId: string;
-      NovaQtd: Integer): TVenda;
-    function RemoverItemDaVenda(const VendaId, ProdutoId: string): TVenda;
+    function AlterarItemDaVenda(const VendaId, ItemId: string;
+      NovaQuantidade: Integer): TVenda;
+    function RemoverItemDaVenda(const VendaId, ItemId: string): TVenda;
 
     // PAGAMENTO
     function ProcessarPagamento(const VendaId: string; Tipo: TTipoPagamento)
@@ -171,28 +171,26 @@ begin
   Result := Res.Venda;
 end;
 
-
-function TAppServices.AlterarItemDaVenda(const VendaId, ProdutoId: string;
-  NovaQtd: Integer): TVenda;
+function TAppServices.AlterarItemDaVenda(
+  const VendaId, ItemId: string; NovaQuantidade: Integer): TVenda;
 var
   UC: IAlterarItemDaVendaUseCase;
   Req: TAlterarItemDaVendaRequest;
   Res: TAlterarItemDaVendaResponse;
 begin
-  UC := TAlterarItemDaVendaUseCase.Create(FRepoVenda, FRepoProduto);
+  UC := TAlterarItemDaVendaUseCase.Create(FRepoVenda);
 
   Req.VendaId := VendaId;
-  Req.ProdutoId := ProdutoId;
-  Req.NovaQuantidade := NovaQtd;
+  Req.ItemId := ItemId;
+  Req.NovaQuantidade := NovaQuantidade;
 
   Res := UC.Executar(Req);
 
   Result := Res.Venda;
-
 end;
 
-function TAppServices.RemoverItemDaVenda(const VendaId,
-  ProdutoId: string): TVenda;
+function TAppServices.RemoverItemDaVenda(
+  const VendaId, ItemId: string): TVenda;
 var
   UC: IRemoverItemDaVendaUseCase;
   Req: TRemoverItemDaVendaRequest;
@@ -201,7 +199,7 @@ begin
   UC := TRemoverItemDaVendaUseCase.Create(FRepoVenda);
 
   Req.VendaId := VendaId;
-  Req.ProdutoId := ProdutoId;
+  Req.ItemId := ItemId;
 
   Res := UC.Executar(Req);
 
@@ -222,6 +220,5 @@ begin
 
   Result := UC.Executar(Req);
 end;
-
 
 end.

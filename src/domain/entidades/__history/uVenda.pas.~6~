@@ -1,0 +1,82 @@
+unit uVenda;
+interface
+uses
+  System.SysUtils, System.Generics.Collections, uItemVenda, uProduto;
+type
+  TVenda = class
+  private
+    FId: string;
+    FClienteId: string;
+    FData: TDateTime;
+    FItens: TObjectList<TItemVenda>;
+    function ObterItemPorId(const ItemId: string): TItemVenda;
+  public
+    constructor Create(const AId: string);
+    destructor Destroy; override;
+    function AdicionarItem(AProduto: TProduto; AQuantidade: Integer): TItemVenda;
+    function Total: Currency;
+    procedure AlterarQuantidadeItem(const ItemId: string; NovaQtd: Integer);
+    procedure RemoverItem(const ItemId: string);
+    property Id: string read FId;
+    property ClienteId: string read FClienteId write FClienteId;
+    property Data: TDateTime read FData;
+    property Itens: TObjectList<TItemVenda> read FItens;
+  end;
+implementation
+constructor TVenda.Create(const AId: string);
+begin
+  FId := AId;
+  FData := Now;
+  FItens := TObjectList<TItemVenda>.Create;
+end;
+destructor TVenda.Destroy;
+begin
+  FItens.Free;
+  inherited;
+end;
+function TVenda.AdicionarItem(AProduto: TProduto; AQuantidade: Integer): TItemVenda;
+begin
+  Result := TItemVenda.Create(AProduto, AQuantidade);
+  FItens.Add(Result);
+end;
+function TVenda.Total: Currency;
+var
+  Item: TItemVenda;
+begin
+  Result := 0;
+  for Item in FItens do
+    Result := Result + Item.ValorTotal;
+end;
+function TVenda.ObterItemPorId(const ItemId: string): TItemVenda;
+var
+  Item: TItemVenda;
+begin
+  Result := nil;
+  for Item in FItens do
+    if Item.Id = ItemId then
+      Exit(Item);
+end;
+procedure TVenda.AlterarQuantidadeItem(const ItemId: string; NovaQtd: Integer);
+var
+  Item: TItemVenda;
+begin
+  Item := ObterItemPorId(ItemId);
+  if not Assigned(Item) then
+    raise Exception.Create('Item não encontrado.');
+
+  Item.Quantidade := NovaQtd;
+end;
+procedure TVenda.RemoverItem(const ItemId: string);
+var
+  I: Integer;
+begin
+  for I := FItens.Count - 1 downto 0 do
+    if FItens[I].Id = ItemId then
+    begin
+      FItens.Delete(I);
+      Exit;
+    end;
+
+  raise Exception.Create('Item não encontrado.');
+end;
+end.

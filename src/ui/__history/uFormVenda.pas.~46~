@@ -1,0 +1,312 @@
+unit uFormVenda;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.StdCtrls,
+  FMX.Controls.Presentation, FMX.ListView.Types, FMX.ListView.Appearances,
+  FMX.ListView.Adapters.Base, FMX.Edit, FMX.EditBox, FMX.SpinBox, FMX.ListView,
+  FMX.ListBox, FMX.Layouts, uVenda, uDMApp, uProcessarPagamentoUseCase,
+  System.Generics.Collections;
+
+type
+  TFormVenda = class(TForm)
+    ToolBar1: TToolBar;
+    lblTitulo: TLabel;
+    btnVoltar: TButton;
+    cmbProdutos: TComboBox;
+    lvItens: TListView;
+    spQuantidade: TSpinBox;
+    btnAdicionarItem: TButton;
+    btnPagarDinheiro: TButton;
+    btnPagarCartao: TButton;
+    btnPagarPix: TButton;
+    layFooter: TLayout;
+    lblTotal: TLabel;
+    Layout1: TLayout;
+    lblClienteSelecionado: TLabel;
+    btnSelecionarCliente: TButton;
+    procedure FormShow(Sender: TObject);
+    procedure btnPagarDinheiroClick(Sender: TObject);
+    procedure btnPagarCartaoClick(Sender: TObject);
+    procedure btnPagarPixClick(Sender: TObject);
+    procedure btnAdicionarItemClick(Sender: TObject);
+    procedure btnSelecionarClienteClick(Sender: TObject);
+    procedure btnVoltarClick(Sender: TObject);
+    procedure lvItensItemClick(const Sender: TObject;
+      const AItem: TListViewItem);
+  private
+    FVenda: TVenda;
+    procedure CriarNovaVenda;
+    procedure CarregarProdutos;
+    procedure AtualizarCarrinho;
+    procedure ProcessarPagamento(Tipo: TTipoPagamento);
+    procedure RemoverItemDaVenda(const ItemId: string);
+    procedure AlterarQuantidadeDoItem(const ItemId: string);
+
+  public
+    SelectedClienteId: string;
+  end;
+
+var
+  FormVenda: TFormVenda;
+
+implementation
+
+uses
+  uItemVenda, uProduto, uFormClientes, FMX.Dialogs;
+
+{$R *.fmx}
+
+procedure TFormVenda.FormShow(Sender: TObject);
+begin
+  CriarNovaVenda;
+  CarregarProdutos;
+  AtualizarCarrinho;
+end;
+
+procedure TFormVenda.lvItensItemClick(const Sender: TObject;
+  const AItem: TListViewItem);
+var
+  Opcao: Integer;
+  ItemId: string;
+begin
+  ItemId := AItem.TagString;
+
+  Opcao := MessageDlg(
+    'O que deseja fazer com "' + AItem.Text + '"?',
+    TMsgDlgType.mtInformation,
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel],
+    0,
+    TMsgDlgBtn.mbCancel
+  );
+
+  {
+    Yes     = Alterar quantidade
+    No      = Remover item
+    Cancel  = Nada
+  }
+
+  case Opcao of
+    mrYes:
+      AlterarQuantidadeDoItem(ItemId); // vamos criar esse método
+    mrNo:
+      RemoverItemDaVenda(ItemId);      // vamos criar esse método
+  end;
+end;
+
+
+procedure TFormVenda.RemoverItemDaVenda(const ItemId: string);
+begin
+  if MessageDlg('Remover este item?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+    Exit;
+
+  TThread.Queue(nil,
+    procedure
+    begin
+      FVenda := DMApp.App.RemoverItemDaVenda(FVenda.Id, ItemId);
+      AtualizarCarrinho;
+      ShowMessage('Item removido.');
+    end
+  );
+end;
+//procedure TFormVenda.RemoverItemDaVenda(const ProdutoId: string);
+//begin
+//  if MessageDlg('Remover este item?', TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrNo then
+//    Exit;
+//
+//  FVenda := DMApp.App.RemoverItemDaVenda(FVenda.Id, ProdutoId);
+//
+//  AtualizarCarrinho;
+//
+//  ShowMessage('Item removido.');
+//end;
+
+procedure TFormVenda.AlterarQuantidadeDoItem(const ItemId: string);
+var
+  NovaQtdStr: string;
+  NovaQtd: Integer;
+begin
+  if not InputQuery('Alterar quantidade', ['Nova quantidade:'], NovaQtdStr) then
+    Exit;
+
+  if not TryStrToInt(NovaQtdStr, NovaQtd) or (NovaQtd <= 0) then
+  begin
+    ShowMessage('Quantidade inválida.');
+    Exit;
+  end;
+
+  TThread.Queue(nil,
+    procedure
+    begin
+      FVenda := DMApp.App.AlterarItemDaVenda(FVenda.Id, ItemId, NovaQtd);
+      AtualizarCarrinho;
+    end
+  );
+end;
+//procedure TFormVenda.AlterarQuantidadeDoItem(const ProdutoId: string);
+//var
+//  NovaQtdStr: string;
+//  NovaQtd: Integer;
+//begin
+//  if not InputQuery('Alterar quantidade', ['Nova quantidade:'], NovaQtdStr) then
+//    Exit;
+//
+//  if not TryStrToInt(NovaQtdStr, NovaQtd) or (NovaQtd <= 0) then
+//  begin
+//    ShowMessage('Quantidade inválida.');
+//    Exit;
+//  end;
+//
+//  FVenda := DMApp.App.AlterarItemDaVenda(FVenda.Id, ProdutoId, NovaQtd);
+//
+//  AtualizarCarrinho;
+//end;
+
+procedure TFormVenda.AtualizarCarrinho;
+var
+  Item: TItemVenda;
+  ListItem: TListViewItem;
+begin
+  lvItens.BeginUpdate;
+  try
+    lvItens.Items.Clear;
+
+    for Item in FVenda.Itens do
+    begin
+      ListItem := lvItens.Items.Add;
+
+      ListItem.Text := Item.Produto.Nome;
+
+      ListItem.Detail :=
+        Format('%d x R$ %.2f = R$ %.2f',
+        [Item.Quantidade, Item.Produto.Preco, Item.ValorTotal]);
+
+      ListItem.TagString := Item.Id;   // AGORA PEGA ItemId
+    end;
+
+    lblTotal.Text := Format('Total: R$ %.2f', [FVenda.Total]);
+  finally
+    lvItens.EndUpdate;
+  end;
+end;
+
+//procedure TFormVenda.AtualizarCarrinho;
+//var
+//  Item: TItemVenda;
+//  P: TProduto;
+//  ListItem: TListViewItem;
+//begin
+//  lvItens.Items.Clear;
+//
+//  for Item in FVenda.Itens do
+//  begin
+//    P := Item.Produto;
+//
+//    ListItem := lvItens.Items.Add;
+//    ListItem.Text := P.Nome;
+//    ListItem.Detail :=
+//      Format('%d x R$ %.2f = R$ %.2f',
+//      [Item.Quantidade, P.Preco, Item.ValorTotal]);
+//
+//    ListItem.TagString := Item.Id; // ItemId
+//  end;
+//
+//  lblTotal.Text := Format('Total: R$ %.2f', [FVenda.Total]);
+//
+//end;
+
+procedure TFormVenda.btnAdicionarItemClick(Sender: TObject);
+var
+  Produto: TProduto;
+begin
+  if cmbProdutos.ItemIndex < 0 then
+  begin
+    ShowMessage('Selecione um produto.');
+    Exit;
+  end;
+
+  Produto := TProduto(cmbProdutos.Items.Objects[cmbProdutos.ItemIndex]);
+
+  FVenda := DMApp.App.AdicionarItem(
+    FVenda.Id,
+    Produto.Id,
+    Round(spQuantidade.Value)
+  );
+
+  AtualizarCarrinho;
+
+end;
+
+procedure TFormVenda.btnPagarCartaoClick(Sender: TObject);
+begin
+  ProcessarPagamento(tpCartao);
+end;
+
+procedure TFormVenda.btnPagarDinheiroClick(Sender: TObject);
+begin
+  ProcessarPagamento(tpDinheiro);
+end;
+
+procedure TFormVenda.btnPagarPixClick(Sender: TObject);
+begin
+  ProcessarPagamento(tpPix);
+end;
+
+procedure TFormVenda.btnSelecionarClienteClick(Sender: TObject);
+var
+  ClienteId: string;
+begin
+  with TFormClientes.Create(Self) do
+  begin
+    // Abrimos como modal para o usuário escolher
+    if ShowModal = mrOk then
+    begin
+      ClienteId := SelectedClienteId; // Vamos criar isso a seguir
+      FVenda := DMApp.App.DefinirClienteDaVenda(FVenda.Id, ClienteId);
+      lblClienteSelecionado.Text := 'Cliente: ' + ClienteId;
+    end;
+
+    Free;
+  end;
+
+end;
+
+procedure TFormVenda.btnVoltarClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFormVenda.CarregarProdutos;
+var
+  Lista: TObjectList<TProduto>;
+  P: TProduto;
+begin
+  cmbProdutos.Clear;
+  Lista := DMApp.App.ListarProdutos;
+
+  for P in Lista do
+    cmbProdutos.Items.AddObject(P.Nome, TObject(P));
+
+end;
+
+procedure TFormVenda.ProcessarPagamento(Tipo: TTipoPagamento);
+var
+  Resp: TProcessarPagamentoResponse;
+begin
+  Resp := DMApp.App.ProcessarPagamento(FVenda.Id, Tipo);
+
+  if Resp.Sucesso then
+    ShowMessage('Pagamento concluído! ' + Resp.Mensagem)
+  else
+    ShowMessage('Falha: ' + Resp.Mensagem);
+
+end;
+
+procedure TFormVenda.CriarNovaVenda;
+begin
+  FVenda := DMApp.App.CriarVenda;
+end;
+
+end.

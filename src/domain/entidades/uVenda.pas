@@ -3,7 +3,7 @@ unit uVenda;
 interface
 
 uses
-  System.SysUtils, System.Generics.Collections, uItemVenda;
+  System.SysUtils, System.Generics.Collections, uItemVenda, uProduto;
 
 type
   TVenda = class
@@ -12,14 +12,14 @@ type
     FClienteId: string;
     FData: TDateTime;
     FItens: TObjectList<TItemVenda>;
+    function ObterItemPorId(const ItemId: string): TItemVenda;
   public
     constructor Create(const AId: string);
     destructor Destroy; override;
-
-    procedure AdicionarItem(AItem: TItemVenda);
-
+    function AdicionarItem(AItem: TItemVenda): TItemVenda;
     function Total: Currency;
-
+    procedure AlterarQuantidadeItem(const ItemId: string; NovaQtd: Integer);
+    procedure RemoverItem(const ItemId: string);
     property Id: string read FId;
     property ClienteId: string read FClienteId write FClienteId;
     property Data: TDateTime read FData;
@@ -41,9 +41,10 @@ begin
   inherited;
 end;
 
-procedure TVenda.AdicionarItem(AItem: TItemVenda);
+function TVenda.AdicionarItem(AItem: TItemVenda): TItemVenda;
 begin
   FItens.Add(AItem);
+  Result := AItem;
 end;
 
 function TVenda.Total: Currency;
@@ -55,5 +56,39 @@ begin
     Result := Result + Item.ValorTotal;
 end;
 
-end.
+function TVenda.ObterItemPorId(const ItemId: string): TItemVenda;
+var
+  Item: TItemVenda;
+begin
+  Result := nil;
+  for Item in FItens do
+    if Item.Id = ItemId then
+      Exit(Item);
+end;
 
+procedure TVenda.AlterarQuantidadeItem(const ItemId: string; NovaQtd: Integer);
+var
+  Item: TItemVenda;
+begin
+  Item := ObterItemPorId(ItemId);
+  if not Assigned(Item) then
+    raise Exception.Create('Item não encontrado.');
+
+  Item.Quantidade := NovaQtd;
+end;
+
+procedure TVenda.RemoverItem(const ItemId: string);
+var
+  I: Integer;
+begin
+  for I := FItens.Count - 1 downto 0 do
+    if FItens[I].Id = ItemId then
+    begin
+      FItens.Delete(I);
+      Exit;
+    end;
+
+  raise Exception.Create('Item não encontrado.');
+end;
+
+end.
